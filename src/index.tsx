@@ -1,13 +1,26 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
+import {
+  CssBaseline,
+  GlobalStyles,
+  ThemeProvider,
+  useTheme,
+} from "@mui/material";
+import React, { FC } from "react";
+import { createRoot } from "react-dom/client";
+import App from "@/App";
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
+const root = createRoot(document.body);
 
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+const Index: FC = () => {
+  const theme = useTheme();
+
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <GlobalStyles styles={undefined} />
+
+      <App />
+    </ThemeProvider>
+  );
+};
+
+root.render(<Index />);
