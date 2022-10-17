@@ -7,7 +7,7 @@ interface Form {
   input: string;
 }
 
-export const TestForm: FC = () => {
+export const ProcessImageForm: FC = () => {
   const {
     handleSubmit,
     control,
