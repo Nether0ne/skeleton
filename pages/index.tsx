@@ -7,7 +7,7 @@ import { useEffect } from "react";
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const Home: NextPage = () => {
-  const { data, error } = useSwr<void>("/api/img/decolorize", fetcher);
+  const { data, error } = useSwr<void>("/api/img/test", fetcher);
 
   return (
     <MainLayout>
