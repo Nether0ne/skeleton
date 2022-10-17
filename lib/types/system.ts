@@ -5,3 +5,13 @@ export interface ZhangSuenResponse {
   points?: number[][];
   branches?: number[][];
 }
+
+export interface VisualizeOptions {
+  points?: Option;
+  branches?: Option;
+}
+
+export interface Option {
+  color?: string;
+  required?: boolean;
+}

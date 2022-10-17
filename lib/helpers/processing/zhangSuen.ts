@@ -4,7 +4,7 @@ import {
   getSkeletonPoints,
   modifyImage,
 } from "@helpers/processing/visualize";
-import { ZhangSuenResponse } from "@customTypes/system";
+import { VisualizeOptions, ZhangSuenResponse } from "@customTypes/system";
 
 const white = Jimp.rgbaToInt(0, 0, 0, 255);
 const black = Jimp.rgbaToInt(255, 255, 255, 255);
@@ -45,10 +45,11 @@ const bool2Image = (
 
 const zhangSuenThinning = async (
   img: Jimp,
-  points?: string,
-  branching?: string,
+  options?: VisualizeOptions,
 ): Promise<ZhangSuenResponse> => {
   let s = await image2Bool(img);
+  const { points, branches } = options || {};
+
   let temp: boolean[][] = s.slice().map((i) => i.slice());
   let count = 0;
   do // the missing iteration
@@ -67,11 +68,19 @@ const zhangSuenThinning = async (
   );
 
   return {
-    points: points ? await getSkeletonPoints(skeleton) : undefined,
-    branches: branching ? await getSkeletonBranches(skeleton) : undefined,
+    points:
+      points && points.required ? await getSkeletonPoints(skeleton) : undefined,
+    branches:
+      branches && branches.required
+        ? await getSkeletonBranches(skeleton)
+        : undefined,
     img:
-      points || branching
-        ? await modifyImage(skeleton, points, branching)
+      points || branches
+        ? await modifyImage(
+            skeleton,
+            points ? points.color : undefined,
+            branches ? branches.color : undefined,
+          )
         : skeleton,
   };
 };

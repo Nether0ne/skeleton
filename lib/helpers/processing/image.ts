@@ -30,9 +30,12 @@ const convertToBlackAndWhite = (source: Jimp): Jimp => {
 };
 
 const generateSkeleton = async (source: Jimp): Promise<ZhangSuenResponse> => {
-  const { img: skeleton } = await zhangSuenThinning(source);
+  const thinning = await zhangSuenThinning(source, {
+    branches: { color: "#4257f5" },
+  });
+  const { img: skeleton } = thinning;
   await writeImage(skeleton, "./public/output/");
-  return zhangSuenThinning(source);
+  return thinning;
 };
 
 export { readImage, convertToBlackAndWhite, generateSkeleton };
