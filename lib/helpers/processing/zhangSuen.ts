@@ -4,7 +4,7 @@ import {
   getSkeletonPoints,
   modifyImage,
 } from "@helpers/processing/visualize";
-import { VisualizeOptions, ZhangSuenResponse } from "@customTypes/system";
+import { VisualizeOptions, ZhangSuenResult } from "@/lib/types";
 
 const white = Jimp.rgbaToInt(0, 0, 0, 255);
 const black = Jimp.rgbaToInt(255, 255, 255, 255);
@@ -28,6 +28,7 @@ const bool2Image = (
   s: boolean[][],
   height: number,
   width: number,
+  // @ts-ignore
   ext: Jimp.MIMEType,
 ): Jimp => {
   const img = new Jimp(height, width, ext);
@@ -46,7 +47,7 @@ const bool2Image = (
 const zhangSuenThinning = async (
   img: Jimp,
   options?: VisualizeOptions,
-): Promise<ZhangSuenResponse> => {
+): Promise<ZhangSuenResult> => {
   let s = await image2Bool(img);
   const { points, branches } = options || {};
 

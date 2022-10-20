@@ -1,41 +1,36 @@
 import Jimp from "jimp";
 import { zhangSuenThinning } from "@helpers/processing/zhangSuen";
-import { ZhangSuenResponse } from "@customTypes/system";
-
-const readImage = async (
-  pathToFile: string = "https://i.imgur.com/wLhwSTm.png",
-): Promise<Jimp> => {
-  const img: Jimp = await Jimp.read(pathToFile);
-  return resizeImage(img, 150, 150);
-};
-
-const writeImage = async (img: Jimp, path: string): Promise<string> => {
-  const d = new Date();
-  const route = `${path}${d.getUTCDate()}_${d.getUTCMonth()}_${d.getUTCFullYear()}_${d.getUTCHours()}${d.getUTCMinutes()}${d.getUTCSeconds()}.png`;
-  await img.writeAsync(route);
-  console.log("wrote to " + route);
-  return route;
-};
+import { SkeletonResult, VisualizeOptions } from "types";
 
 const resizeImage = (
   source: Jimp,
-  resizeWidth: number = 150,
-  resizeHeight: number = 150,
+  resizeWidth: number,
+  resizeHeight: number,
 ): Jimp => {
   return source.resize(resizeWidth, resizeHeight, source.getMIME());
 };
 
-const convertToBlackAndWhite = (source: Jimp): Jimp => {
+export const convertToBlackAndWhite = (source: Jimp): Jimp => {
   return source.greyscale().contrast(1);
 };
 
-const generateSkeleton = async (source: Jimp): Promise<ZhangSuenResponse> => {
-  const thinning = await zhangSuenThinning(source, {
-    branches: { color: "#4257f5" },
-  });
-  const { img: skeleton } = thinning;
-  await writeImage(skeleton, "./public/output/");
-  return thinning;
+export const base64ToJimp = async (base64: string): Promise<Jimp> => {
+  return await Jimp.read(Buffer.from(base64));
 };
 
-export { readImage, convertToBlackAndWhite, generateSkeleton };
+export const jimpToBase64 = async (source: Jimp): Promise<string> => {
+  return await source.getBase64Async(source.getMIME());
+};
+
+export const generateSkeleton = async (
+  source: Jimp,
+  options?: VisualizeOptions,
+): Promise<SkeletonResult> => {
+  const thinning = await zhangSuenThinning(source, options);
+  const { points, branches } = thinning;
+  const { w, h } = options || {};
+  const skeleton = w && h ? resizeImage(thinning.img, w, h) : thinning.img;
+  const base64 = await jimpToBase64(skeleton);
+
+  return { base64, points, branches };
+};
