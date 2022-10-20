@@ -22,9 +22,9 @@
       "@themes/*": ["lib/themes/*"],
       "@providers/*": ["lib/providers/*"],
       "@helpers/*": ["lib/helpers/*"],
-      "@customTypes/*": ["lib/types/*"],
       "@pages/*": ["pages/*"],
-      "@api/*": ["pages/api/*"]
+      "@api/*": ["pages/api/*"],
+      "types": ["lib/types/"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
