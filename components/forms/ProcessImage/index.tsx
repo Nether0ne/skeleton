@@ -1,39 +1,26 @@
 import { Box, ImageList, ImageListItem } from "@mui/material";
 import Image from "next/image";
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import { AddImageForm } from "@components/forms/AddImage";
 import { DecolorizeForm } from "@components/forms/Decolorize";
-
-const images = ["test1.png", "test2.jpg", "test3.bmp"].map(
-  (i) => "/input/" + i,
-);
+import { base64ToURL } from "@helpers/processing/image";
+import { Preview } from "@/components/misc/gallery/Preview";
 
 export const ProcessImageForm: FC = () => {
-  const [gallery, setGallery] = useState(images);
-  const [selectedImage, setSelectedImage] = useState(images[0]);
-  const [selectedFile, setSelectedFile] = useState<string>("");
+  const [gallery, setGallery] = useState<string[]>([]);
+  const [selectedImage, setSelectedImage] = useState<string>("");
 
   const handleAdd = (p: string) => {
     setGallery([...gallery, p]);
     setSelectedImage(p);
   };
 
-  useEffect(() => {
-    (async () => {
-      const selectedImageUrl = URL.createObjectURL(selectedImage);
-      const blob = new Blob([selectedImage], { type: "image/png" });
-      console.log(selectedImage);
-      // Convert to file
-      const base64 = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onerror = () => reject(null);
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.readAsDataURL(blob);
-      });
-      setSelectedFile(base64);
-      console.log(base64);
-    })();
-  }, [selectedImage]);
+  const handleDecolorize = async (curr: string, decolorized: string) => {
+    const blob = await base64ToURL(decolorized);
+    const newGallery = gallery.map((a) => (a === curr ? blob : a));
+    setGallery(newGallery);
+    setSelectedImage(blob);
+  };
 
   return (
     <Box
@@ -42,33 +29,32 @@ export const ProcessImageForm: FC = () => {
         display: "flex",
         flexDirection: "column",
         gap: 2,
+        minWidth: "30rem",
       }}>
+      {selectedImage !== "" && <Preview img={selectedImage} />}
       <ImageList
         cols={2}
         gap={8}
-        sx={{ maxHeight: "15rem", overflow: "scroll-y" }}>
+        sx={{ maxHeight: "15rem", overflow: "scroll-y", cursor: "pointer" }}>
         {gallery.map((img) => (
           <ImageListItem
             key={img}
-            sx={{
-              border: selectedImage === img ? "3px solid white" : "none",
-            }}>
+            sx={{ border: selectedImage === img ? "3px solid white" : "none" }}>
             <Image
               src={img}
               alt={"alt"}
               loading="lazy"
-              width={"200rem"}
-              height={"200rem"}
+              width={"100%"}
+              height={"100%"}
               onClick={() => {
                 setSelectedImage(img);
-                console.log(selectedImage);
               }}
             />
           </ImageListItem>
         ))}
         <AddImageForm onAdd={handleAdd} />
       </ImageList>
-      <DecolorizeForm />
+      <DecolorizeForm img={selectedImage} afterAction={handleDecolorize} />
     </Box>
   );
 };

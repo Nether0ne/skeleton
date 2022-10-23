@@ -1,14 +1,21 @@
 import Jimp from "jimp/*";
+import { NextApiRequest } from "next";
 
-export interface Response {
-  success: boolean;
+export interface Image {
+  fieldName: string;
+  originalFileName: string;
+  path: string;
+  headers: { [key: string]: string };
+  size: number;
 }
 
-export interface ResponseError {
-  error: string;
+export interface NextApiRequestWithImage extends NextApiRequest {
+  files: {
+    image: Image[];
+  };
 }
 
-export interface SkeletonSuccessResponse extends Response, SkeletonResult {}
+export interface SkeletonSuccessResponse extends SkeletonResult {}
 
 export interface SkeletonRequest {
   base64: string;
@@ -51,6 +58,6 @@ export interface DecolorizeRequest {
   base64: string;
 }
 
-export interface DecolorizeSuccessResponse extends Response {
+export interface DecolorizeSuccessResponse {
   base64: string;
 }

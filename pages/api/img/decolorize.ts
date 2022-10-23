@@ -1,32 +1,47 @@
+import { DecolorizeSuccessResponse, NextApiRequestWithImage } from "types";
 import {
-  DecolorizeRequest,
-  DecolorizeSuccessResponse,
-  ResponseError,
-} from "types";
-import {
-  base64ToJimp,
   convertToBlackAndWhite,
   jimpToBase64,
 } from "@helpers/processing/image";
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiResponse } from "next";
+import nextConnect from "next-connect";
+import filesMiddleware from "@helpers/middleware/files";
+import Jimp from "jimp";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<DecolorizeSuccessResponse | ResponseError>,
-) {
-  try {
-    const { base64 } = req.body as DecolorizeRequest;
-    const jimp = await base64ToJimp(base64);
-    const newBase64 = await jimpToBase64(convertToBlackAndWhite(jimp));
+const handler = nextConnect();
+handler.use(filesMiddleware);
 
-    res.status(200).json({ success: true, base64: newBase64 });
-  } catch (e: unknown) {
-    if (e instanceof Error) {
-      res.status(500).json({ success: false, error: e.message });
-    } else {
-      res
-        .status(500)
-        .json({ success: false, error: "Unknown error has occured." });
+handler.post(
+  async (
+    req: NextApiRequestWithImage,
+    res: NextApiResponse<DecolorizeSuccessResponse | string>,
+  ) => {
+    try {
+      if (!req.files || req.files.image.length === 0 || !req.files.image[0]) {
+        throw new Error("No image provided");
+      }
+
+      const jimp = await Jimp.read(req.files.image[0].path);
+      const newBase64 = await jimpToBase64(convertToBlackAndWhite(jimp));
+
+      res.status(200).json({ base64: newBase64 });
+    } catch (e: unknown) {
+      console.log(e);
+      if (e instanceof Error) {
+        res.statusMessage = e.message;
+        res.status(500).send("");
+      } else {
+        res.statusMessage = "Unknown error has occured.";
+        res.status(500).send("");
+      }
     }
-  }
-}
+  },
+);
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+export default handler;
