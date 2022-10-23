@@ -26,14 +26,12 @@ handler.post(
 
       res.status(200).json({ base64: newBase64 });
     } catch (e: unknown) {
-      console.log(e);
       if (e instanceof Error) {
         res.statusMessage = e.message;
-        res.status(500).send("");
       } else {
         res.statusMessage = "Unknown error has occured.";
-        res.status(500).send("");
       }
+      res.status(500).send("");
     }
   },
 );

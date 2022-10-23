@@ -4,7 +4,7 @@ import {
   getSkeletonPoints,
   modifyImage,
 } from "@helpers/processing/visualize";
-import { VisualizeOptions, ZhangSuenResult } from "@/lib/types";
+import { VisualizeOptions, ZhangSuenResult } from "types";
 
 const white = Jimp.rgbaToInt(0, 0, 0, 255);
 const black = Jimp.rgbaToInt(255, 255, 255, 255);
@@ -14,9 +14,9 @@ const image2Bool = async (img: Jimp): Promise<boolean[][]> => {
   const height = img.getHeight();
   let s: boolean[][] = [];
 
-  for (let y = 0; y < width; y++) {
+  for (let y = 0; y < height; y++) {
     s[y] = [];
-    for (let x = 0; x < height; x++) {
+    for (let x = 0; x < width; x++) {
       s[y].push(img.getPixelColor(x, y) === black);
     }
   }
@@ -26,15 +26,15 @@ const image2Bool = async (img: Jimp): Promise<boolean[][]> => {
 
 const bool2Image = (
   s: boolean[][],
-  height: number,
   width: number,
+  height: number,
   // @ts-ignore
   ext: Jimp.MIMEType,
 ): Jimp => {
-  const img = new Jimp(height, width, ext);
+  const img = new Jimp(width, height, ext);
 
-  for (let y = 0; y < width; y++) {
-    for (let x = 0; x < height; x++) {
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
       const color = s[y][x] ? black : white;
 
       img.setPixelColor(color, x, y);
@@ -46,41 +46,46 @@ const bool2Image = (
 
 const zhangSuenThinning = async (
   img: Jimp,
-  options?: VisualizeOptions,
+  options: VisualizeOptions,
 ): Promise<ZhangSuenResult> => {
   let s = await image2Bool(img);
-  const { points, branches } = options || {};
+  const {
+    points: {
+      required: pRequired,
+      additional: { color: pColor, required: pColorRequired },
+    },
+    branches: {
+      required: bRequired,
+      additional: { color: bColor, required: bColorRequired },
+    },
+  } = options;
 
   let temp: boolean[][] = s.slice().map((i) => i.slice());
   let count = 0;
   do // the missing iteration
   {
     count = step(1, temp, s);
-    temp = s.slice().map((i) => i.slice()); // ..and on each..
+    temp = s.slice().map((i) => [...i]); // ..and on each..
     count += step(2, temp, s);
-    temp = s.slice().map((i) => i.slice()); // ..call!
+    temp = s.slice().map((i) => [...i]); // ..call!
   } while (count > 0);
 
   const skeleton = bool2Image(
     s,
-    img.getHeight(),
     img.getWidth(),
+    img.getHeight(),
     img.getMIME(),
   );
 
   return {
-    points:
-      points && points.required ? await getSkeletonPoints(skeleton) : undefined,
-    branches:
-      branches && branches.required
-        ? await getSkeletonBranches(skeleton)
-        : undefined,
+    points: pRequired ? getSkeletonPoints(skeleton) : undefined,
+    branches: bRequired ? getSkeletonBranches(skeleton) : undefined,
     img:
-      points || branches
-        ? await modifyImage(
+      pColorRequired || bColorRequired
+        ? modifyImage(
             skeleton,
-            points ? points.color : undefined,
-            branches ? branches.color : undefined,
+            pColorRequired ? pColor : undefined,
+            bColorRequired ? bColor : undefined,
           )
         : skeleton,
   };

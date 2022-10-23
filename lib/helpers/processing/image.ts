@@ -16,12 +16,11 @@ export const convertToBlackAndWhite = (source: Jimp): Jimp => {
 
 export const generateSkeleton = async (
   source: Jimp,
-  options?: VisualizeOptions,
+  options: VisualizeOptions,
 ): Promise<SkeletonResult> => {
-  const thinning = await zhangSuenThinning(source, options);
-  const { points, branches } = thinning;
-  const { w, h } = options || {};
-  const skeleton = w && h ? resizeImage(thinning.img, w, h) : thinning.img;
+  const { w, h } = options;
+  const thinning = await zhangSuenThinning(resizeImage(source, w, h), options);
+  const { points, branches, img: skeleton } = thinning;
   const base64 = await jimpToBase64(skeleton);
 
   return { base64, points, branches };

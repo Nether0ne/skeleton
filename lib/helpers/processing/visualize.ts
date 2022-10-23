@@ -9,9 +9,9 @@ const getSkeletonPoints = (img: Jimp): number[][] => {
 
   let s: number[][] = [];
 
-  for (let y = 0; y < width; y++) {
+  for (let y = 0; y < height; y++) {
     s[y] = [];
-    for (let x = 0; x < height; x++) {
+    for (let x = 0; x < width; x++) {
       s[y].push(img.getPixelColor(x, y));
     }
   }
@@ -58,9 +58,9 @@ const getSkeletonBranches = (img: Jimp): number[][] => {
 
   let s: boolean[][] = [];
 
-  for (let y = 0; y < width; y++) {
+  for (let y = 0; y < height; y++) {
     s[y] = [];
-    for (let x = 0; x < height; x++) {
+    for (let x = 0; x < width; x++) {
       s[y].push(img.getPixelColor(x, y) === black);
     }
   }
@@ -99,11 +99,7 @@ const getSkeletonBranches = (img: Jimp): number[][] => {
   return points;
 };
 
-const modifyImage = async (
-  img: Jimp,
-  points?: string,
-  branching?: string,
-): Promise<Jimp> => {
+const modifyImage = (img: Jimp, points?: string, branching?: string): Jimp => {
   const modifiedImage = img.clone();
 
   const pointsArray = getSkeletonPoints(img);

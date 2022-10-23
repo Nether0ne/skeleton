@@ -19,7 +19,7 @@ export interface SkeletonSuccessResponse extends SkeletonResult {}
 
 export interface SkeletonRequest {
   base64: string;
-  options: VisualizeOptions;
+  options: string;
 }
 
 export interface SkeletonResult {
@@ -29,21 +29,29 @@ export interface SkeletonResult {
 }
 
 export interface VisualizeOptions {
-  w?: number;
-  h?: number;
-  points?: PointsOption;
-  branches?: BranchesOption;
+  w: number;
+  h: number;
+  points: PointsOption;
+  branches: BranchesOption;
 }
 
 export interface Option {
-  required?: boolean;
+  required: boolean;
 }
 
 export interface PointsOption extends Option {
+  additional: ColoredPointsOption;
+}
+
+export interface ColoredPointsOption extends Option {
   color?: string;
 }
 
 export interface BranchesOption extends Option {
+  additional: ColoredBranchesOption;
+}
+
+export interface ColoredBranchesOption extends Option {
   color?: string;
   r?: number;
 }
@@ -60,4 +68,10 @@ export interface DecolorizeRequest {
 
 export interface DecolorizeSuccessResponse {
   base64: string;
+}
+
+export interface GalleryItem {
+  src: string;
+  w: number;
+  h: number;
 }
