@@ -1,10 +1,11 @@
 import { FC } from "react";
 import Image from "next/image";
+import { GalleryItem } from "types";
 
 interface Props {
-  img: string;
+  item: GalleryItem;
 }
 
-export const Preview: FC<Props> = ({ img }) => {
-  return <Image src={img} width={"100%"} height={"100%"} alt="Preview" />;
+export const Preview: FC<Props> = ({ item: { src, w, h } }) => {
+  return <Image src={src} width={w} height={h} alt="Preview" />;
 };

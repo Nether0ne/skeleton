@@ -39,7 +39,6 @@ export const AddImageForm: FC<Props> = ({ disabled, onAdd }) => {
         img.src = newPhotoUrl;
         const { w, h } = await getDimensions();
         onAdd({ src: newPhotoUrl, w, h });
-        console.log({ src: newPhotoUrl, w, h });
         e.target.value = "";
       }
     }

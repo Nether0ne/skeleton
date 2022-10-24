@@ -1,6 +1,5 @@
 import Jimp from "jimp";
 
-const white = Jimp.rgbaToInt(0, 0, 0, 255);
 const black = Jimp.rgbaToInt(255, 255, 255, 255);
 
 const getSkeletonPoints = (img: Jimp): number[][] => {
