@@ -113,10 +113,13 @@ export const ProcessImageForm: FC = () => {
         });
 
         if (res.status !== 200) {
-          throw new Error(res.statusText);
+          if (res.status === 504) {
+            throw new Error("Request timeout.");
+          } else {
+            throw new Error(res.statusText);
+          }
         }
 
-        // TODO: apply branches/points state
         const { base64, points, branches } =
           (await res.json()) as SkeletonSuccessResponse;
         const src = await base64ToURL(base64);
@@ -185,7 +188,7 @@ export const ProcessImageForm: FC = () => {
               display: "none",
             },
             // hide scroll chrome
-            "-ms-overflow-style": "none",
+            msOverflowStyle: "none",
             cursor: !isSubmitting ? "pointer" : "wait",
           }}>
           {gallery.map((i) => (
@@ -238,8 +241,8 @@ export const ProcessImageForm: FC = () => {
               message: "Image width cannot be less than 1px",
             },
             max: {
-              value: 2500,
-              message: "Image width cannot be more than 2500px",
+              value: 1250,
+              message: "Image width cannot be more than 1250px",
             },
           }}
         />
@@ -267,8 +270,8 @@ export const ProcessImageForm: FC = () => {
               message: "Image height cannot be less than 1px",
             },
             max: {
-              value: 2500,
-              message: "Image height cannot be more than 2500px",
+              value: 1250,
+              message: "Image height cannot be more than 1250px",
             },
           }}
         />

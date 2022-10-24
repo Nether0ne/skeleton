@@ -29,7 +29,11 @@ export const DecolorizeForm: FC<Props> = ({ disabled, img, afterAction }) => {
       });
 
       if (res.status !== 200) {
-        throw new Error(res.statusText);
+        if (res.status === 504) {
+          throw new Error("Request timeout.");
+        } else {
+          throw new Error(res.statusText);
+        }
       }
 
       const { base64 } = (await res.json()) as DecolorizeSuccessResponse;
