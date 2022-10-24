@@ -140,7 +140,6 @@ export const ProcessImageForm: FC = () => {
         img.src = src;
         const { w, h } = await getDimensions();
         setResultImage({ src, w, h });
-
         setResultPoints(
           points ? points.reduce((a, b) => a + `[${b[0]}, ${b[1]}]\n`, "") : "",
         );
