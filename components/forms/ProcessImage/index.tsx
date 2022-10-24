@@ -110,13 +110,14 @@ export const ProcessImageForm: FC = () => {
         const res = await fetch("/api/img/skeleton", {
           method: "POST",
           body,
+          // @ts-ignore
+          signal: AbortSignal.timeout(25000),
         });
 
         if (res.status !== 200) {
           throw new Error(res.statusText);
         }
 
-        // TODO: apply branches/points state
         const { base64, points, branches } =
           (await res.json()) as SkeletonSuccessResponse;
         const src = await base64ToURL(base64);
@@ -135,6 +136,7 @@ export const ProcessImageForm: FC = () => {
         img.src = src;
         const { w, h } = await getDimensions();
         setResultImage({ src, w, h });
+
         setResultPoints(
           points ? points.reduce((a, b) => a + `[${b[0]}, ${b[1]}]\n`, "") : "",
         );
@@ -148,7 +150,11 @@ export const ProcessImageForm: FC = () => {
       } catch (e: unknown) {
         let message = "Unknown error has occurred: ";
         if (e instanceof Error) {
-          message = e.message;
+          if (e.message === "The user aborted a request.") {
+            message = "Request timeout.";
+          } else {
+            message = e.message;
+          }
         }
         enqueueSnackbar(message, { variant: "error", autoHideDuration: 3000 });
         reject();
@@ -185,7 +191,7 @@ export const ProcessImageForm: FC = () => {
               display: "none",
             },
             // hide scroll chrome
-            "-ms-overflow-style": "none",
+            msOverflowStyle: "none",
             cursor: !isSubmitting ? "pointer" : "wait",
           }}>
           {gallery.map((i) => (
