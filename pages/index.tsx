@@ -1,12 +1,16 @@
+import { CustomHead } from "@components/layout/Head";
 import { ProcessImageForm } from "@components/forms/ProcessImage";
 import { MainLayout } from "@components/layout/Main";
 import type { NextPage } from "next";
 
 const Home: NextPage = () => {
   return (
-    <MainLayout>
-      <ProcessImageForm />
-    </MainLayout>
+    <>
+      <CustomHead pageName={"Image Skeleton Generation"} />
+      <MainLayout>
+        <ProcessImageForm />
+      </MainLayout>
+    </>
   );
 };
 
