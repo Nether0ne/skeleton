@@ -7,5 +7,9 @@ interface Props {
 }
 
 export const Preview: FC<Props> = ({ item: { src, w, h } }) => {
-  return <Image src={src} width={w} height={h} alt="Preview" />;
+  return (
+    <a href={src} target="_blank" rel="noreferrer">
+      <Image src={src} width={w} height={h} alt="Preview" />
+    </a>
+  );
 };
