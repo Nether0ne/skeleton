@@ -115,7 +115,11 @@ export const ProcessImageForm: FC = () => {
         });
 
         if (res.status !== 200) {
-          throw new Error(res.statusText);
+          if (res.status === 504) {
+            throw new Error("Request timeout.");
+          } else {
+            throw new Error(res.statusText);
+          }
         }
 
         const { base64, points, branches } =
@@ -150,11 +154,7 @@ export const ProcessImageForm: FC = () => {
       } catch (e: unknown) {
         let message = "Unknown error has occurred: ";
         if (e instanceof Error) {
-          if (e.message === "The user aborted a request.") {
-            message = "Request timeout.";
-          } else {
-            message = e.message;
-          }
+          message = e.message;
         }
         enqueueSnackbar(message, { variant: "error", autoHideDuration: 3000 });
         reject();

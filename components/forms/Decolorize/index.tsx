@@ -26,12 +26,14 @@ export const DecolorizeForm: FC<Props> = ({ disabled, img, afterAction }) => {
       const res = await fetch("/api/img/decolorize", {
         method: "POST",
         body,
-        // @ts-ignore
-        signal: AbortSignal.timeout(10000),
       });
 
       if (res.status !== 200) {
-        throw new Error(res.statusText);
+        if (res.status === 504) {
+          throw new Error("Request timeout.");
+        } else {
+          throw new Error(res.statusText);
+        }
       }
 
       const { base64 } = (await res.json()) as DecolorizeSuccessResponse;
@@ -41,11 +43,7 @@ export const DecolorizeForm: FC<Props> = ({ disabled, img, afterAction }) => {
     } catch (e: unknown) {
       let message = "Unknown error has occurred: ";
       if (e instanceof Error) {
-        if (e.message === "The user aborted a request.") {
-          message = "Request timeout.";
-        } else {
-          message = e.message;
-        }
+        message = e.message;
       }
       enqueueSnackbar(message, { variant: "error", autoHideDuration: 3000 });
     } finally {
