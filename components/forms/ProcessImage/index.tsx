@@ -244,8 +244,8 @@ export const ProcessImageForm: FC = () => {
               message: "Image width cannot be less than 1px",
             },
             max: {
-              value: 2500,
-              message: "Image width cannot be more than 2500px",
+              value: 1250,
+              message: "Image width cannot be more than 1250px",
             },
           }}
         />
@@ -273,8 +273,8 @@ export const ProcessImageForm: FC = () => {
               message: "Image height cannot be less than 1px",
             },
             max: {
-              value: 2500,
-              message: "Image height cannot be more than 2500px",
+              value: 1250,
+              message: "Image height cannot be more than 1250px",
             },
           }}
         />

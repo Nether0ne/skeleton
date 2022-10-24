@@ -42,7 +42,22 @@ export const AddImageForm: FC<Props> = ({ disabled, onAdd }) => {
 
           const newPhotoUrl = URL.createObjectURL(newImage);
           img.src = newPhotoUrl;
-          const { w, h } = await getDimensions();
+          let { w, h } = await getDimensions();
+
+          const max = 1250;
+          if (w > max || h > max) {
+            const ratio = w < h ? w / h : h / w;
+
+            // resize if more than allowed
+            if (w > max) {
+              w = max;
+              h = Math.round(h * ratio);
+            } else if (h > max) {
+              h = max;
+              w = Math.round(w * ratio);
+            }
+          }
+
           onAdd({ src: newPhotoUrl, w, h });
         }
       }
