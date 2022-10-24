@@ -110,8 +110,6 @@ export const ProcessImageForm: FC = () => {
         const res = await fetch("/api/img/skeleton", {
           method: "POST",
           body,
-          // @ts-ignore
-          signal: AbortSignal.timeout(25000),
         });
 
         if (res.status !== 200) {
