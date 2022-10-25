@@ -1,7 +1,7 @@
 import Jimp from "jimp";
 import {
   getSkeletonBranches,
-  getSkeletonPoints,
+  getSkeletonEdges,
   modifyImage,
 } from "@helpers/processing/visualize";
 import { VisualizeOptions, ZhangSuenResult } from "types";
@@ -50,14 +50,8 @@ const zhangSuenThinning = async (
 ): Promise<ZhangSuenResult> => {
   let s = await image2Bool(img);
   const {
-    points: {
-      required: pRequired,
-      additional: { color: pColor, required: pColorRequired },
-    },
-    branches: {
-      required: bRequired,
-      additional: { color: bColor, required: bColorRequired },
-    },
+    edges: { required: eRequired, additional: eAdditional },
+    branches: { required: bRequired, additional: bAdditional },
   } = options;
 
   let temp: boolean[][] = s.slice().map((i) => i.slice());
@@ -78,16 +72,13 @@ const zhangSuenThinning = async (
   );
 
   return {
-    points: pRequired ? getSkeletonPoints(skeleton) : undefined,
+    edges: eRequired ? getSkeletonEdges(skeleton) : undefined,
     branches: bRequired ? getSkeletonBranches(skeleton) : undefined,
-    img:
-      pColorRequired || bColorRequired
-        ? modifyImage(
-            skeleton,
-            pColorRequired ? pColor : undefined,
-            bColorRequired ? bColor : undefined,
-          )
-        : skeleton,
+    img: modifyImage(
+      skeleton,
+      eAdditional?.required ? eAdditional : undefined,
+      bAdditional?.required ? bAdditional : undefined,
+    ),
   };
 };
 

@@ -20,10 +20,10 @@ export const generateSkeleton = async (
 ): Promise<SkeletonResult> => {
   const { w, h } = options;
   const thinning = await zhangSuenThinning(resizeImage(source, w, h), options);
-  const { points, branches, img: skeleton } = thinning;
+  const { edges, branches, img: skeleton } = thinning;
   const base64 = await jimpToBase64(skeleton);
 
-  return { base64, points, branches };
+  return { base64, edges, branches };
 };
 
 const url2Blob = async (url: string) => {

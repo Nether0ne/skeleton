@@ -21,19 +21,20 @@ import { LoadingButton } from "@mui/lab";
 const defaultValues = {
   w: 0,
   h: 0,
-  points: {
+  edges: {
     required: true,
     additional: {
       required: false,
       color: "#3f51b5",
+      r: 1,
     },
   },
   branches: {
     required: true,
     additional: {
-      r: 1,
       required: false,
       color: "#a33ed5",
+      r: 1,
     },
   },
 };
@@ -43,7 +44,7 @@ export const ProcessImageForm: FC = () => {
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
   const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null);
   const [resultImage, setResultImage] = useState<GalleryItem>();
-  const [resultPoints, setResultPoints] = useState<string>("");
+  const [resultEdges, setResultEdges] = useState<string>("");
   const [resultBranches, setResultBranches] = useState<string>("");
 
   const {
@@ -56,9 +57,9 @@ export const ProcessImageForm: FC = () => {
     defaultValues,
   });
 
-  const coloredPoints = useWatch({
+  const coloredEdges = useWatch({
     control,
-    name: "points.additional.required",
+    name: "edges.additional.required",
   });
 
   const coloredBranches = useWatch({
@@ -106,7 +107,6 @@ export const ProcessImageForm: FC = () => {
         );
 
         body.append("options", JSON.stringify(data));
-
         const res = await fetch("/api/img/skeleton", {
           method: "POST",
           body,
@@ -120,7 +120,7 @@ export const ProcessImageForm: FC = () => {
           }
         }
 
-        const { base64, points, branches } =
+        const { base64, edges, branches } =
           (await res.json()) as SkeletonSuccessResponse;
         const src = await base64ToURL(base64);
 
@@ -138,12 +138,20 @@ export const ProcessImageForm: FC = () => {
         img.src = src;
         const { w, h } = await getDimensions();
         setResultImage({ src, w, h });
-        setResultPoints(
-          points ? points.reduce((a, b) => a + `[${b[0]}, ${b[1]}]\n`, "") : "",
+        setResultEdges(
+          edges
+            ? edges.reduce(
+                (a, b) => a + `[${b[0]}, ${b[1]}]\n`,
+                `Count: ${edges.length}\n`,
+              )
+            : "",
         );
         setResultBranches(
           branches
-            ? branches.reduce((a, b) => a + `[${b[0]}, ${b[1]}]\n`, "")
+            ? branches.reduce(
+                (a, b) => a + `[${b[0]}, ${b[1]}]\n`,
+                `Count: ${branches.length}\n`,
+              )
             : "",
         );
 
@@ -182,6 +190,7 @@ export const ProcessImageForm: FC = () => {
           cols={3}
           gap={8}
           sx={{
+            mb: 4,
             maxHeight: "15rem",
             // hide scroll ff
             "::-webkit-scrollbar": {
@@ -223,7 +232,7 @@ export const ProcessImageForm: FC = () => {
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <TextField
               disabled={isSubmitting}
-              inputMode="numeric"
+              type={"number"}
               label="Result image width"
               variant="outlined"
               color={!!value ? "success" : !error ? "primary" : "error"}
@@ -231,7 +240,9 @@ export const ProcessImageForm: FC = () => {
               onChange={onChange}
               error={!!error}
               helperText={error ? error.message : " "}
-              sx={{ mt: 4, mb: error ? 2 : 0 }}
+              sx={{ mb: error ? 2 : 0 }}
+              margin={"normal"}
+              sx={{ mt: 4 }}
             />
           )}
           rules={{
@@ -253,7 +264,7 @@ export const ProcessImageForm: FC = () => {
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <TextField
               disabled={isSubmitting}
-              inputMode="numeric"
+              type={"number"}
               label="Result image height"
               variant="outlined"
               color={!!value ? "success" : !error ? "primary" : "error"}
@@ -261,6 +272,7 @@ export const ProcessImageForm: FC = () => {
               onChange={onChange}
               error={!!error}
               helperText={error ? error.message : " "}
+              margin={"normal"}
             />
           )}
           rules={{
@@ -277,45 +289,77 @@ export const ProcessImageForm: FC = () => {
         />
 
         <Controller
-          name="points.required"
+          name="edges.required"
           control={control}
           render={({ field: { onChange, value } }) => (
             <FormControlLabel
               disabled={isSubmitting}
               control={<Checkbox checked={value} onChange={onChange} />}
-              label="Show points coordinates"
+              label="Show edge coordinates"
             />
           )}
         />
 
         <Controller
-          name="points.additional.required"
+          name="edges.additional.required"
           control={control}
           render={({ field: { onChange, value } }) => (
             <FormControlLabel
               disabled={isSubmitting}
               control={<Checkbox checked={value} onChange={onChange} />}
-              label="Color points on the result image"
+              label="Color edges on the result image"
             />
           )}
         />
 
-        <Collapse in={coloredPoints}>
-          <Controller
-            name="points.additional.color"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <TextField
-                disabled={isSubmitting}
-                type="color"
-                label="Points color"
-                variant="outlined"
-                value={value}
-                onChange={onChange}
-                sx={{ width: "100%", mt: 1 }}
-              />
-            )}
-          />
+        <Collapse in={coloredEdges}>
+          <Box display={"flex"} flexDirection={"row"} width={"100%"} gap={2}>
+            <Controller
+              name="edges.additional.color"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <TextField
+                  disabled={isSubmitting}
+                  type="color"
+                  label="Edges color"
+                  variant="outlined"
+                  value={value}
+                  onChange={onChange}
+                  sx={{ width: "50%" }}
+                  margin={"normal"}
+                />
+              )}
+            />
+            <Controller
+              name="edges.additional.r"
+              control={control}
+              render={({
+                field: { onChange, value },
+                fieldState: { error },
+              }) => (
+                <TextField
+                  disabled={isSubmitting}
+                  type={"number"}
+                  label="Edges radius (px)"
+                  variant="outlined"
+                  value={value}
+                  onChange={onChange}
+                  error={!!error}
+                  color={!!value ? "success" : !error ? "primary" : "error"}
+                  helperText={error ? error.message : " "}
+                  sx={{ width: "50%" }}
+                  margin={"normal"}
+                />
+              )}
+              rules={{
+                required: "Edges radius is required",
+                min: {
+                  value: 1,
+                  message: "Edges radius cannot be less than 1px",
+                },
+              }}
+            />
+          </Box>
         </Collapse>
 
         <Controller
@@ -343,27 +387,59 @@ export const ProcessImageForm: FC = () => {
         />
 
         <Collapse in={coloredBranches}>
-          <Controller
-            name="branches.additional.color"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <TextField
-                disabled={isSubmitting}
-                type="color"
-                label="Branches color"
-                variant="outlined"
-                value={value}
-                onChange={onChange}
-                sx={{ width: "100%", mt: 1 }}
-              />
-            )}
-          />
+          <Box display={"flex"} flexDirection={"row"} width={"100%"} gap={2}>
+            <Controller
+              name="branches.additional.color"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <TextField
+                  disabled={isSubmitting}
+                  type="color"
+                  label="Branches color"
+                  variant="outlined"
+                  value={value}
+                  onChange={onChange}
+                  sx={{ width: "50%" }}
+                  margin={"normal"}
+                />
+              )}
+            />
+            <Controller
+              name="branches.additional.r"
+              control={control}
+              render={({
+                field: { onChange, value },
+                fieldState: { error },
+              }) => (
+                <TextField
+                  disabled={isSubmitting}
+                  type={"number"}
+                  label="Branches radius (px)"
+                  variant="outlined"
+                  value={value}
+                  onChange={onChange}
+                  error={!!error}
+                  color={!!value ? "success" : !error ? "primary" : "error"}
+                  helperText={error ? error.message : " "}
+                  sx={{ width: "50%" }}
+                  margin={"normal"}
+                />
+              )}
+              rules={{
+                required: "Branches radius is required",
+                min: {
+                  value: 1,
+                  message: "Branches radius cannot be less than 1px",
+                },
+              }}
+            />
+          </Box>
         </Collapse>
 
         <LoadingButton
           type={"submit"}
           loading={isSubmitting}
-          disabled={selectedImage === null}
+          disabled={!isValid || selectedImage === null}
           variant={"contained"}
           color={"primary"}
           sx={{ mt: 2 }}>
@@ -395,17 +471,18 @@ export const ProcessImageForm: FC = () => {
           </Box>
         </Box>
 
-        <Collapse in={resultPoints !== "" || resultBranches !== ""}>
+        <Collapse in={resultEdges !== "" || resultBranches !== ""}>
           <Box display={"flex"} flexDirection={"row"} gap={2}>
-            {resultPoints !== "" && (
+            {resultEdges !== "" && (
               <TextField
                 variant={"standard"}
                 multiline
-                label={"Points"}
+                label={"Edges"}
                 maxRows={4}
                 disabled
-                value={resultPoints}
+                value={resultEdges}
                 sx={{ width: "50%" }}
+                margin={"normal"}
               />
             )}
 
@@ -418,6 +495,7 @@ export const ProcessImageForm: FC = () => {
                 disabled
                 value={resultBranches}
                 sx={{ width: "50%" }}
+                margin={"normal"}
               />
             )}
           </Box>
