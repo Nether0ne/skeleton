@@ -26,7 +26,7 @@ handler.post(
 
       res.status(200).json({ base64: newBase64 });
     } catch (e: unknown) {
-      if (e instanceof Error) {
+      if (e instanceof Error && e.message !== "") {
         res.statusMessage = e.message;
       } else {
         res.statusMessage = "Unknown error has occured.";
@@ -39,7 +39,7 @@ handler.post(
 export const config = {
   api: {
     bodyParser: false,
-    responseLimit: "10mb",
+    responseLimit: "4mb",
   },
 };
 
