@@ -71,6 +71,10 @@ export interface DecolorizeSuccessResponse {
   base64: string;
 }
 
+export interface ConvertSuccessResponse {
+  base64: string;
+}
+
 export interface GalleryItem {
   src: string;
   w: number;

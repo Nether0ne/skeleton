@@ -51,8 +51,27 @@ export const URL2Base64 = async (url: string): Promise<string> => {
   return await blob2Base64(await url2Blob(url));
 };
 
-export const jimpToBase64 = async (source: Jimp): Promise<string> => {
-  return await source.getBase64Async(source.getMIME());
+export const jimpToBase64 = async (
+  source: Jimp,
+  ext?: string,
+): Promise<string> => {
+  // @ts-ignore
+  let mime: Jimp.MIME_BMP | Jimp.MIME_JPEG | Jimp.MIME_PNG = source.getMIME();
+
+  if (ext !== undefined) {
+    switch (ext) {
+      case "jpeg": {
+        mime = Jimp.MIME_JPEG;
+        break;
+      }
+      case "bmp": {
+        mime = Jimp.MIME_BMP;
+        break;
+      }
+    }
+  }
+
+  return await source.getBase64Async(mime);
 };
 
 export const URL2Blob = async (base64: string): Promise<Blob> => {
