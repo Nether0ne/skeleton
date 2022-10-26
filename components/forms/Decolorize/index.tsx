@@ -3,6 +3,8 @@ import { useSnackbar } from "notistack";
 import { LoadingButton } from "@mui/lab";
 import { base64ToURL, URL2Blob } from "@helpers/processing/image";
 import { DecolorizeSuccessResponse } from "types";
+import { Tooltip } from "@mui/material";
+import { InfoOutlined } from "@mui/icons-material";
 
 interface Props {
   disabled: boolean;
@@ -31,6 +33,8 @@ export const DecolorizeForm: FC<Props> = ({ disabled, img, afterAction }) => {
       if (res.status !== 200) {
         if (res.status === 504) {
           throw new Error("Request timeout.");
+        } else if (res.status === 413) {
+          throw new Error("File size exceeds 4MB limit.");
         } else {
           throw new Error(res.statusText);
         }
@@ -52,13 +56,22 @@ export const DecolorizeForm: FC<Props> = ({ disabled, img, afterAction }) => {
   };
 
   return (
-    <LoadingButton
-      variant={"contained"}
-      loading={isConverting}
-      onClick={handleClick}
-      disabled={disabled}
-      color={"secondary"}>
-      Convert image to black and white
-    </LoadingButton>
+    <>
+      <Tooltip
+        title={
+          "This algorithm works with black and white images only. Decolorize image if necessary"
+        }>
+        <LoadingButton
+          variant={"contained"}
+          loading={isConverting}
+          onClick={handleClick}
+          disabled={disabled}
+          color={"secondary"}
+          size="small"
+          startIcon={<InfoOutlined />}>
+          Convert image to black and white
+        </LoadingButton>
+      </Tooltip>
+    </>
   );
 };

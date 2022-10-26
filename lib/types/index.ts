@@ -24,14 +24,14 @@ export interface SkeletonRequest {
 
 export interface SkeletonResult {
   base64: string;
-  points?: number[][];
+  edges?: number[][];
   branches?: number[][];
 }
 
 export interface VisualizeOptions {
   w: number;
   h: number;
-  points: PointsOption;
+  edges: EdgesOption;
   branches: BranchesOption;
 }
 
@@ -39,26 +39,27 @@ export interface Option {
   required: boolean;
 }
 
-export interface PointsOption extends Option {
-  additional: ColoredPointsOption;
+export interface EdgesOption extends Option {
+  additional?: ColoredEdgesOption;
 }
 
-export interface ColoredPointsOption extends Option {
-  color?: string;
+export interface ColoredEdgesOption extends Option {
+  color: string;
+  r: number;
 }
 
 export interface BranchesOption extends Option {
-  additional: ColoredBranchesOption;
+  additional?: ColoredBranchesOption;
 }
 
 export interface ColoredBranchesOption extends Option {
-  color?: string;
-  r?: number;
+  color: string;
+  r: number;
 }
 
 export interface ZhangSuenResult {
   img: Jimp;
-  points?: number[][];
+  edges?: number[][];
   branches?: number[][];
 }
 
@@ -67,6 +68,10 @@ export interface DecolorizeRequest {
 }
 
 export interface DecolorizeSuccessResponse {
+  base64: string;
+}
+
+export interface ConvertSuccessResponse {
   base64: string;
 }
 

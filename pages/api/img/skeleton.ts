@@ -22,6 +22,12 @@ handler.post(
       let parsedOptions = JSON.parse(options);
       parsedOptions.w = parseInt(parsedOptions.w);
       parsedOptions.h = parseInt(parsedOptions.h);
+      parsedOptions.edges.additional.r = parseInt(
+        parsedOptions.edges.additional.r as string,
+      );
+      parsedOptions.branches.additional.r = parseInt(
+        parsedOptions.branches.additional.r as string,
+      );
 
       if (!req.files || req.files.image.length === 0 || !req.files.image[0]) {
         throw new Error("No image provided");
@@ -32,7 +38,7 @@ handler.post(
 
       res.status(200).json(result);
     } catch (e: unknown) {
-      if (e instanceof Error) {
+      if (e instanceof Error && e.message !== "") {
         res.statusMessage = e.message;
       } else {
         res.statusMessage = "Unknown error has occured.";
@@ -45,6 +51,7 @@ handler.post(
 export const config = {
   api: {
     bodyParser: false,
+    responseLimit: "4mb",
   },
 };
 
