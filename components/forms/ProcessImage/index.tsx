@@ -17,6 +17,7 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import { base64ToURL, URL2Blob } from "@helpers/processing/image";
 import { useSnackbar } from "notistack";
 import { LoadingButton } from "@mui/lab";
+import { SaveAsForm } from "@components/forms/SaveImage";
 
 const defaultValues = {
   w: 0,
@@ -43,7 +44,7 @@ export const ProcessImageForm: FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
   const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null);
-  const [resultImage, setResultImage] = useState<GalleryItem>();
+  const [resultImage, setResultImage] = useState<GalleryItem | null>(null);
   const [resultEdges, setResultEdges] = useState<string>("");
   const [resultBranches, setResultBranches] = useState<string>("");
 
@@ -90,7 +91,15 @@ export const ProcessImageForm: FC = () => {
     setSelectedImage(decolorizedItem);
   };
 
+  const resetResult = () => {
+    setResultImage(null);
+    setResultEdges("");
+    setResultBranches("");
+  };
+
   const onSubmit = (data: VisualizeOptions) => {
+    resetResult();
+
     return new Promise(async (resolve, reject) => {
       try {
         if (!selectedImage) {
@@ -191,7 +200,7 @@ export const ProcessImageForm: FC = () => {
           gap={8}
           sx={{
             mb: 4,
-            maxHeight: "15rem",
+            maxHeight: "7rem",
             // hide scroll ff
             "::-webkit-scrollbar": {
               display: "none",
@@ -240,9 +249,8 @@ export const ProcessImageForm: FC = () => {
               onChange={onChange}
               error={!!error}
               helperText={error ? error.message : " "}
-              sx={{ mb: error ? 2 : 0 }}
+              sx={{ mt: 4, mb: error ? 2 : 0 }}
               margin={"normal"}
-              sx={{ mt: 4 }}
             />
           )}
           rules={{
@@ -252,8 +260,8 @@ export const ProcessImageForm: FC = () => {
               message: "Image width cannot be less than 1px",
             },
             max: {
-              value: 1250,
-              message: "Image width cannot be more than 1250px",
+              value: 2500,
+              message: "Image width cannot be more than 2500px",
             },
           }}
         />
@@ -282,8 +290,8 @@ export const ProcessImageForm: FC = () => {
               message: "Image height cannot be less than 1px",
             },
             max: {
-              value: 1250,
-              message: "Image height cannot be more than 1250px",
+              value: 2500,
+              message: "Image height cannot be more than 2500px",
             },
           }}
         />
@@ -352,11 +360,13 @@ export const ProcessImageForm: FC = () => {
                 />
               )}
               rules={{
-                required: "Edges radius is required",
-                min: {
-                  value: 1,
-                  message: "Edges radius cannot be less than 1px",
-                },
+                required: coloredEdges && "Edges radius is required",
+                min: coloredEdges
+                  ? {
+                      value: 1,
+                      message: "Edges radius cannot be less than 1px",
+                    }
+                  : undefined,
               }}
             />
           </Box>
@@ -426,11 +436,13 @@ export const ProcessImageForm: FC = () => {
                 />
               )}
               rules={{
-                required: "Branches radius is required",
-                min: {
-                  value: 1,
-                  message: "Branches radius cannot be less than 1px",
-                },
+                required: coloredBranches && "Branches radius is required",
+                min: coloredBranches
+                  ? {
+                      value: 1,
+                      message: "Branches radius cannot be less than 1px",
+                    }
+                  : undefined,
               }}
             />
           </Box>
@@ -439,7 +451,7 @@ export const ProcessImageForm: FC = () => {
         <LoadingButton
           type={"submit"}
           loading={isSubmitting}
-          disabled={!isValid || selectedImage === null}
+          disabled={selectedImage === null}
           variant={"contained"}
           color={"primary"}
           sx={{ mt: 2 }}>
@@ -472,7 +484,7 @@ export const ProcessImageForm: FC = () => {
         </Box>
 
         <Collapse in={resultEdges !== "" || resultBranches !== ""}>
-          <Box display={"flex"} flexDirection={"row"} gap={2}>
+          <Box display={"flex"} flexDirection={"row"} gap={2} mb={2}>
             {resultEdges !== "" && (
               <TextField
                 variant={"standard"}
@@ -500,6 +512,8 @@ export const ProcessImageForm: FC = () => {
             )}
           </Box>
         </Collapse>
+
+        {resultImage && resultImage.src && <SaveAsForm img={resultImage.src} />}
       </Box>
     </Box>
   );
