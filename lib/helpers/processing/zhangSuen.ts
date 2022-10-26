@@ -1,7 +1,6 @@
 import Jimp from "jimp";
 import {
-  getSkeletonBranches,
-  getSkeletonEdges,
+  getSkeletonInterestPoints,
   modifyImage,
 } from "@helpers/processing/visualize";
 import { VisualizeOptions, ZhangSuenResult } from "types";
@@ -71,9 +70,15 @@ const zhangSuenThinning = async (
     img.getMIME(),
   );
 
+  const { edgesArray, branchesArray } = getSkeletonInterestPoints(
+    skeleton,
+    eRequired,
+    bRequired,
+  );
+
   return {
-    edges: eRequired ? getSkeletonEdges(skeleton) : undefined,
-    branches: bRequired ? getSkeletonBranches(skeleton) : undefined,
+    edges: edgesArray || undefined,
+    branches: branchesArray || undefined,
     img: modifyImage(
       skeleton,
       eAdditional?.required ? eAdditional : undefined,
