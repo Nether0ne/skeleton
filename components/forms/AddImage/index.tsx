@@ -44,7 +44,7 @@ export const AddImageForm: FC<Props> = ({ disabled, onAdd }) => {
           img.src = newPhotoUrl;
           let { w, h } = await getDimensions();
 
-          const max = 2500;
+          const max = 1250;
 
           // resize if more than allowed
           if (w > max) {
