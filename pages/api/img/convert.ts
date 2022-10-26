@@ -24,11 +24,8 @@ handler.post(
       const jimp = await Jimp.read(req.files.image[0].path);
       const newBase64 = await jimpToBase64(jimp, ext);
 
-      // console.log(newBase64);
-
       res.status(200).json({ base64: newBase64 });
     } catch (e: unknown) {
-      console.log(e);
       if (e instanceof Error) {
         res.statusMessage = e.message;
       } else {
@@ -42,7 +39,7 @@ handler.post(
 export const config = {
   api: {
     bodyParser: false,
-    responseLimit: false,
+    responseLimit: "10mb",
   },
 };
 

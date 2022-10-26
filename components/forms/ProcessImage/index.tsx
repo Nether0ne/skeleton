@@ -124,6 +124,8 @@ export const ProcessImageForm: FC = () => {
         if (res.status !== 200) {
           if (res.status === 504) {
             throw new Error("Request timeout.");
+          } else if (res.status === 413) {
+            throw new Error("File size exceeds 4MB limit.");
           } else {
             throw new Error(res.statusText);
           }

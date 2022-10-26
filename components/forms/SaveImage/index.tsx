@@ -40,9 +40,10 @@ export const SaveAsForm: FC<Props> = ({ img }) => {
       });
 
       if (res.status !== 200) {
-        console.log(res);
         if (res.status === 504) {
           throw new Error("Request timeout.");
+        } else if (res.status === 413) {
+          throw new Error("File size exceeds 8MB limit.");
         } else {
           throw new Error(res.statusText);
         }
@@ -56,7 +57,6 @@ export const SaveAsForm: FC<Props> = ({ img }) => {
       a.href = base64;
       a.click();
     } catch (e: unknown) {
-      console.log(e);
       let message = "Unknown error has occurred: ";
       if (e instanceof Error) {
         message = e.message;
